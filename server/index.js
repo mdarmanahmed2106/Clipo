@@ -23,7 +23,7 @@ app.use(cors({
     callback(new Error(`CORS policy: origin ${origin} not allowed`));
   },
   methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type'],
+  allowedHeaders: ['Content-Type', 'X-Delete-Token'],
 }));
 
 // ── Rate limiting ─────────────────────────────────────────────────────────────
