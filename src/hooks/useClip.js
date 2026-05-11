@@ -119,8 +119,8 @@ export function useRetrieveClip() {
         }
       }
 
-      if (!keyB64) {
-        throw new Error('Decryption key not found in URL. Share the full link including the #fragment.');
+      if (!keyB64 || keyB64.length < 20) {
+        throw new Error('Invalid or missing decryption key in URL. Share the full link including the #fragment.');
       }
 
       // 3. Import the key

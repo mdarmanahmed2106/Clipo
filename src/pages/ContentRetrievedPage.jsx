@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { CheckCircle, Copy, Trash2, Shield, Eye, EyeOff, RefreshCw, Clock, AlertTriangle } from 'lucide-react';
 import { useDestroyClip, useRetrieveClip } from '../hooks/useClip';
@@ -9,6 +9,7 @@ export default function ContentRetrievedPage() {
   const { destroy, loading: destroying } = useDestroyClip();
 
   const { retrieve, loading: fetching, error: retrieveError } = useRetrieveClip();
+  const fetchStarted = useRef(false);
   const [retrievedData, setRetrievedData] = useState(null);
 
   const finalData = location.state || retrievedData;
@@ -26,14 +27,20 @@ export default function ContentRetrievedPage() {
 
   // Handle retrieval from hash on mount
   useEffect(() => {
+    // 1. Skip if we already have content from navigation state
     if (location.state && location.state.content) return;
+
+    // 2. Prevent double-fetch in React 18 dev mode (StrictMode)
+    if (fetchStarted.current) return;
 
     const hash = window.location.hash.slice(1);
     if (hash) {
+      fetchStarted.current = true;
       retrieve(hash)
         .then(data => setRetrievedData(data))
         .catch(() => {
           // If retrieval fails, the error will be in retrieveError
+          fetchStarted.current = false; // allow retry if failed? 
         });
     } else if (!location.state) {
       // No state and no hash? Go home.
