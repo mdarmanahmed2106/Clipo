@@ -8,27 +8,83 @@ export default function ContentRetrievedPage() {
   const navigate = useNavigate();
   const { destroy, loading: destroying } = useDestroyClip();
 
+  const { retrieve, loading: fetching, error: retrieveError } = useRetrieveClip();
+  const [retrievedData, setRetrievedData] = useState(null);
+
+  const finalData = location.state || retrievedData;
   const {
     code,
     content,
     expiresAt,
     burnOnRead = false,
     createdAt,
-  } = location.state || {};
+  } = finalData || {};
 
   const [copied, setCopied] = useState(false);
   const [masked, setMasked] = useState(false);
   const [destroyed, setDestroyed] = useState(false);
 
-  // Fix #13: Redirect if accessed directly (using useEffect)
+  // Handle retrieval from hash on mount
   useEffect(() => {
-    if (!location.state || !content) {
-      navigate('/');
-    }
-  }, [location.state, content, navigate]);
+    if (location.state && location.state.content) return;
 
-  if (!location.state || !content) {
-    return null;
+    const hash = window.location.hash.slice(1);
+    if (hash) {
+      retrieve(hash)
+        .then(data => setRetrievedData(data))
+        .catch(() => {
+          // If retrieval fails, the error will be in retrieveError
+        });
+    } else if (!location.state) {
+      // No state and no hash? Go home.
+      const timer = setTimeout(() => navigate('/retrieve'), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [location.state, navigate, retrieve]);
+
+  if (fetching) {
+    return (
+      <main className="section animate-fadeIn">
+        <div className="card" style={{ maxWidth: 420, width: '100%', padding: '48px 40px', textAlign: 'center' }}>
+          <RefreshCw size={32} className="spin" style={{ marginBottom: 16, color: 'var(--color-accent)' }} />
+          <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>Fetching & Decrypting...</h2>
+          <p style={{ color: 'var(--color-text-secondary)', fontSize: 14 }}>
+            Accessing your secure clip using the provided key.
+          </p>
+        </div>
+      </main>
+    );
+  }
+
+  if (retrieveError) {
+    return (
+      <main className="section animate-fadeIn">
+        <div className="card" style={{ maxWidth: 420, width: '100%', padding: '40px', textAlign: 'center' }}>
+          <div style={{ fontSize: 40, marginBottom: 16 }}>⚠️</div>
+          <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8, color: '#ff453a' }}>Retrieval Failed</h2>
+          <p style={{ color: 'var(--color-text-secondary)', fontSize: 14, marginBottom: 24 }}>
+            {retrieveError}
+          </p>
+          <button className="btn btn-primary btn-full" onClick={() => navigate('/retrieve')}>
+            Try Manually
+          </button>
+        </div>
+      </main>
+    );
+  }
+
+  if (!finalData || !content) {
+    return (
+      <main className="section">
+        <div className="card" style={{ maxWidth: 400, padding: 40, textAlign: 'center' }}>
+          <AlertTriangle size={32} style={{ color: 'var(--color-warning)', marginBottom: 16 }} />
+          <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>No Content Found</h2>
+          <p style={{ color: 'var(--color-text-secondary)', fontSize: 14 }}>
+            Redirecting to retrieval page...
+          </p>
+        </div>
+      </main>
+    );
   }
 
   const expiresAtDate = expiresAt ? new Date(expiresAt) : null;

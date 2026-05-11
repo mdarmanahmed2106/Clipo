@@ -444,6 +444,7 @@ body {
   border: 1px solid rgba(0,122,255,0.2);
   border-radius: var(--radius-lg);
   user-select: all;
+  word-break: break-all;
 }
 
 /* Status dot */

@@ -28,6 +28,7 @@ export default function SentSuccessPage() {
   const navigate = useNavigate();
   const {
     code = 'XXXXXX',
+    fullCode = '',
     shareLink = '',
     retention = 60,
     expiresAt,
@@ -38,7 +39,7 @@ export default function SentSuccessPage() {
   const [copiedLink, setCopiedLink] = useState(false);
 
   const handleCopyCode = async () => {
-    try { await navigator.clipboard.writeText(code); } catch {}
+    try { await navigator.clipboard.writeText(fullCode || code); } catch {}
     setCopiedCode(true);
     setTimeout(() => setCopiedCode(false), 2000);
   };
@@ -67,7 +68,7 @@ export default function SentSuccessPage() {
         style={{ maxWidth: 520, width: '100%', padding: '48px 44px', textAlign: 'center' }}
       >
         {/* Success icon */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
+        <div style={{ display: 'center', justifyContent: 'center', marginBottom: 24 }}>
           <div className="success-icon">
             <CheckCircle size={36} strokeWidth={1.5} />
           </div>
@@ -86,7 +87,9 @@ export default function SentSuccessPage() {
           Sync Code
         </div>
         <div className="relative" style={{ marginBottom: 16 }}>
-          <div className="sync-code" id="sync-code-display">{code}</div>
+          <div className="sync-code" id="sync-code-display" style={{ fontSize: (fullCode || code).length > 20 ? 14 : 28, letterSpacing: (fullCode || code).length > 20 ? '0.05em' : '0.25em' }}>
+            {fullCode || code}
+          </div>
           {copiedCode && <div className="copy-feedback">Copied!</div>}
         </div>
 
@@ -98,7 +101,7 @@ export default function SentSuccessPage() {
           id="copy-code-btn"
         >
           <Copy size={16} />
-          {copiedCode ? 'Copied to clipboard' : 'Copy Code'}
+          {copiedCode ? 'Copied to clipboard' : 'Copy Sync Code'}
         </button>
 
         {/* Copy share link button */}

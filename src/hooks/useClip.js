@@ -45,11 +45,13 @@ export function useSendClip() {
       // 4. Send only encrypted data to the server
       const result = await createClip({ ciphertext, iv, retentionMinutes, burnOnRead });
       // 5. Build the share link — key goes in the fragment, never to the server
-      const shareLink = `${window.location.origin}/retrieved#${result.code}:${exportedKey}`;
+      const fullCode = `${result.code}:${exportedKey}`;
+      const shareLink = `${window.location.origin}/retrieved#${fullCode}`;
 
       // 6. Persist to local history
       saveToHistory({
         code: result.code,
+        fullCode,
         shareLink,
         retentionMinutes,
         burnOnRead,
@@ -58,7 +60,7 @@ export function useSendClip() {
         expiresAt: result.expiresAt,
       });
 
-      return { code: result.code, shareLink, expiresAt: result.expiresAt };
+      return { code: result.code, fullCode, shareLink, expiresAt: result.expiresAt };
     } catch (err) {
       setError(err.message);
       throw err;
@@ -89,23 +91,39 @@ export function useRetrieveClip() {
     try {
       // Parse "CODE:KEY" or just "CODE" (fallback: key must be in hash)
       let code, keyB64;
-      if (codeOrHash.includes(':')) {
-        [code, keyB64] = codeOrHash.split(':');
+      
+      // Handle cases where the input might contain the # fragment or a full URL
+      let cleanInput = codeOrHash.trim();
+      if (cleanInput.includes('#')) {
+        cleanInput = cleanInput.split('#')[1];
+      }
+
+      if (cleanInput.includes(':')) {
+        [code, keyB64] = cleanInput.split(':');
       } else {
-        code = codeOrHash;
+        code = cleanInput;
         keyB64 = null;
       }
+
+      if (!code) throw new Error('Invalid code provided.');
       code = code.toUpperCase().trim();
 
       // 1. Fetch encrypted payload from server
       const clip = await fetchClip(code);
 
-      // 2. If no key was provided in the hash, we can't decrypt
+      // 2. If no key was provided in the input, check the current URL hash as fallback
+      if (!keyB64) {
+        const hash = window.location.hash.slice(1);
+        if (hash.includes(':') && hash.split(':')[0].toUpperCase() === code) {
+          keyB64 = hash.split(':')[1];
+        }
+      }
+
       if (!keyB64) {
         throw new Error('Decryption key not found in URL. Share the full link including the #fragment.');
       }
 
-      // 3. Import the key from the URL fragment
+      // 3. Import the key
       const key = await importKey(keyB64);
 
       // 4. Decrypt locally

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Key, RefreshCw, Download, Lock, ChevronRight, AlertTriangle } from 'lucide-react';
 import { useRetrieveClip } from '../hooks/useClip';
@@ -8,30 +8,21 @@ export default function RetrievePage() {
   const { retrieve, loading, error } = useRetrieveClip();
   const [code, setCode] = useState('');
 
+  // Auto-handle hash on mount
+  useEffect(() => {
+    const hash = window.location.hash.slice(1);
+    if (hash) {
+      navigate(`/retrieved#${hash}`, { replace: true });
+    }
+  }, [navigate]);
+
   const handleRetrieve = async (e) => {
     e.preventDefault();
-    if (!code.trim()) return;
+    const input = code.trim();
+    if (!input) return;
+    
     try {
-      // Check if there's a key in the URL hash already (from a share link)
-      const hash = window.location.hash.slice(1); // remove #
-      let input = code.toUpperCase().trim();
-      // If user pasted a full link like http://localhost:5173/retrieved#CODE:KEY
-      // extract just the fragment
-      if (input.startsWith('HTTP')) {
-        try {
-          const url = new URL(input.toLowerCase().startsWith('http') ? input : `https://${input}`);
-          input = url.hash.slice(1);
-        } catch {}
-      }
-      // If input is just a code (no key), try to pair with hash
-      if (!input.includes(':') && hash.includes(':')) {
-        input = hash;
-      } else if (!input.includes(':')) {
-        // Code-only entry — will fail decryption but server fetch might work
-        // We still proceed and show a friendly error about the missing key
-        input = input;
-      }
-
+      // The retrieve hook now handles parsing (CODE:KEY, fragments, or full URLs)
       const result = await retrieve(input);
       navigate('/retrieved', {
         state: {
@@ -42,23 +33,20 @@ export default function RetrievePage() {
           createdAt: result.createdAt,
         }
       });
-    } catch {
+    } catch (err) {
       // error shown from hook
     }
   };
 
   const handleCodeChange = (e) => {
-    // Allow code-only or full share link paste
-    const val = e.target.value.trim();
+    const val = e.target.value;
     
-    // If it's a URL or contains fragments, keep it as-is for the retrieve hook to parse
-    if (val.includes('http') || val.includes('#') || val.includes(':')) {
-      setCode(val);
-    } else {
-      // If it's just characters, assume it's a code
-      // We don't truncate here anymore to avoid silent failures; 
-      // the retrieve hook will handle validation.
+    // If it's a simple 6-char code, uppercase it. 
+    // If it's longer (has key or URL), keep original case for the key.
+    if (val.length <= 6 && !val.includes(':') && !val.includes('http')) {
       setCode(val.toUpperCase().replace(/[^A-Z0-9]/g, ''));
+    } else {
+      setCode(val);
     }
   };
 
