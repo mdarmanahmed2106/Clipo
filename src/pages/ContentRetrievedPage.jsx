@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { CheckCircle, Copy, Trash2, Shield, Eye, EyeOff, RefreshCw, Clock, AlertTriangle } from 'lucide-react';
-import { useDestroyClip } from '../hooks/useClip';
+import { useDestroyClip, useRetrieveClip } from '../hooks/useClip';
 
 export default function ContentRetrievedPage() {
   const location = useLocation();
