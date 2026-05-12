@@ -42,8 +42,8 @@ export function useSendClip() {
       const { ciphertext, iv } = await encrypt(content, key);
       // 3. Export the key to URL-safe base64
       const exportedKey = await exportKey(key);
-      // 4. Send only encrypted data to the server
-      const result = await createClip({ ciphertext, iv, retentionMinutes, burnOnRead });
+      // 4. Send encrypted data + key to the server (allows code-only retrieval)
+      const result = await createClip({ ciphertext, iv, encryptionKey: exportedKey, retentionMinutes, burnOnRead });
       // 5. Build the share link — key goes in the fragment, never to the server
       const fullCode = `${result.code}:${exportedKey}`;
       const shareLink = `${window.location.origin}/retrieved#${fullCode}`;
@@ -119,8 +119,27 @@ export function useRetrieveClip() {
         }
       }
 
+      // If no key was found, try to recover from localStorage history (sender's device)
       if (!keyB64 || keyB64.length < 20) {
-        throw new Error('Invalid or missing decryption key in URL. Share the full link including the #fragment.');
+        const history = loadHistory();
+        const entry = history.find(h => h.code?.toUpperCase() === code);
+        if (entry?.fullCode) {
+          const parts = entry.fullCode.split(':');
+          if (parts.length === 2) {
+            keyB64 = parts[1];
+          }
+        }
+      }
+
+      // If still no key, check if the server provided one (Code-Only Cross-Device Retrieval)
+      if (!keyB64 || keyB64.length < 20) {
+        if (clip.encryptionKey) {
+          keyB64 = clip.encryptionKey;
+        }
+      }
+
+      if (!keyB64 || keyB64.length < 20) {
+        throw new Error('Decryption key not found. Please paste the full share link (including the #fragment) — the key is required to decrypt your content.');
       }
 
       // 3. Import the key

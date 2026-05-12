@@ -62,8 +62,8 @@ export default function RetrievePage() {
           Access your <span>encrypted</span> clip
         </h1>
         <p className="hero-subtitle" style={{ fontSize: 15 }}>
-          Paste the sync code or the full share link from your other device.
-          Decryption happens entirely in your browser — the key never touches our servers.
+          Enter the 6-character code or paste the full share link from another device.
+          Clipo uses AES-256-GCM encryption to keep your data safe.
         </p>
       </div>
 
@@ -104,7 +104,7 @@ export default function RetrievePage() {
               style={{ textAlign: 'center', fontSize: code.length > 10 ? 13 : 22, letterSpacing: code.length > 10 ? 0 : '0.2em', height: 60 }}
             />
             <p style={{ fontSize: 13, color: 'var(--color-text-muted)', marginTop: 4 }}>
-              Paste the 6-character code or the full share link (includes decryption key).
+              Enter the 6-character code (e.g. DXDD6D) or the full share link.
             </p>
           </div>
 
@@ -162,8 +162,7 @@ export default function RetrievePage() {
             🔑 How decryption works
           </div>
           <div style={{ fontSize: 13, color: 'var(--color-text-muted)', lineHeight: 1.6 }}>
-            The decryption key is embedded in the share link fragment (<code style={{ color: 'var(--color-text-primary)', fontFamily: 'var(--font-mono)' }}>#CODE:KEY</code>).
-            Paste the full link and we'll decrypt it locally — the key is never sent to our server.
+            Every clip is encrypted with AES-256-GCM. You can retrieve it on any device using just the 6-character code.
           </div>
         </div>
       </div>
@@ -171,7 +170,7 @@ export default function RetrievePage() {
       {/* Info cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px,1fr))', gap: 14, width: '100%', maxWidth: 760, animationDelay: '0.2s' }} className="animate-fadeUp">
         {[
-          { icon: <Lock size={18} />, title: 'Zero-Knowledge', desc: 'Encryption keys never touch our servers. Decrypted locally.' },
+          { icon: <Lock size={18} />, title: 'End-to-End Safety', desc: 'AES-256-GCM encryption ensures your content is protected in transit.' },
           { icon: <RefreshCw size={18} />, title: 'Instant Sync', desc: 'Share across machines using a unique temporary ID.' },
         ].map(item => (
           <div className="feature-card" key={item.title} style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>

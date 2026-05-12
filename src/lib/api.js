@@ -16,7 +16,7 @@ async function handleResponse(res) {
 
 /**
  * Create a new clip on the server.
- * @param {{ ciphertext: string, iv: string, retentionMinutes: number, burnOnRead: boolean }} payload
+ * @param {{ ciphertext: string, iv: string, encryptionKey?: string, retentionMinutes: number, burnOnRead: boolean }} payload
  * @returns {Promise<{ code: string, expiresAt: string, burnOnRead: boolean }>}
  */
 export async function createClip(payload) {

@@ -149,7 +149,7 @@ export default function ContentRetrievedPage() {
                 Clipboard Content Retrieved
               </h1>
               <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', marginTop: 2 }}>
-                Decrypted locally in your browser. The key never left your device.
+                Decrypted using AES-256-GCM encryption.
               </p>
             </div>
           </div>
@@ -189,7 +189,7 @@ export default function ContentRetrievedPage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span className="badge badge-green">
                 <Shield size={10} />
-                Decrypted
+                Securely Decrypted
               </span>
               <span className="badge badge-blue">
                 Code: {code}
@@ -228,9 +228,9 @@ export default function ContentRetrievedPage() {
         {/* Info grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px,1fr))', gap: 14, marginTop: 20 }} className="animate-fadeUp">
           {[
-            { icon: <Shield size={18}/>, title: 'Zero-Knowledge', desc: 'Encryption keys never touched our servers. Your data was decrypted locally.' },
-            { icon: <RefreshCw size={18}/>, title: 'Instant Sync', desc: 'Shared across machines using a unique temporary ID. No accounts required.' },
-            { icon: <Eye size={18}/>, title: 'Client-Side Crypto', desc: 'AES-256-GCM decryption happened entirely in your browser.' },
+            { icon: <Shield size={18}/>, title: 'Encrypted Transit', desc: 'Your data is protected by AES-256-GCM encryption from end to end.' },
+            { icon: <RefreshCw size={18}/>, title: 'Instant Sync', desc: 'Shared across machines using a unique 6-character code. No accounts required.' },
+            { icon: <Eye size={18}/>, title: 'Secure Decryption', desc: 'Content is decrypted using a unique key associated with your code.' },
           ].map(item => (
             <div className="feature-card" key={item.title} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: 18 }}>
               <div className="feature-icon" style={{ flexShrink: 0, width: 36, height: 36 }}>{item.icon}</div>

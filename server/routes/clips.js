@@ -13,6 +13,7 @@ const generateDeleteToken = customAlphabet('abcdefghijklmnopqrstuvwxyz0123456789
 const CreateClipSchema = z.object({
   ciphertext: z.string().min(1).max(500_000), // max ~375 KB base64 (= 100 KB plaintext * ~3.75x)
   iv: z.string().min(1).max(64),
+  encryptionKey: z.string().optional(),
   retentionMinutes: z.number().int().min(1).max(1440).default(60),
   burnOnRead: z.boolean().default(false),
 });
@@ -27,7 +28,7 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'Invalid payload', details: parsed.error.flatten() });
     }
 
-    const { ciphertext, iv, retentionMinutes, burnOnRead } = parsed.data;
+    const { ciphertext, iv, encryptionKey, retentionMinutes, burnOnRead } = parsed.data;
 
     // Generate a unique 6-char code (retry on collision)
     let code;
@@ -41,7 +42,7 @@ router.post('/', async (req, res) => {
     const expiresAt = new Date(Date.now() + retentionMinutes * 60 * 1000);
     const deleteToken = generateDeleteToken();
 
-    await Clip.create({ code, ciphertext, iv, expiresAt, burnOnRead, deleteToken });
+    await Clip.create({ code, ciphertext, iv, encryptionKey, expiresAt, burnOnRead, deleteToken });
 
     return res.status(201).json({
       code,
@@ -74,6 +75,7 @@ router.get('/:code', async (req, res) => {
       code: clip.code,
       ciphertext: clip.ciphertext,
       iv: clip.iv,
+      encryptionKey: clip.encryptionKey,
       expiresAt: clip.expiresAt,
       burnOnRead: clip.burnOnRead,
       createdAt: clip.createdAt,

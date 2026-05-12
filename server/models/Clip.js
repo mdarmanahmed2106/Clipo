@@ -19,6 +19,11 @@ const ClipSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    // Optional encryption key for code-only retrieval (if provided, zero-knowledge is lost)
+    encryptionKey: {
+      type: String,
+      required: false,
+    },
     // TTL field — MongoDB auto-deletes documents after this date
     expiresAt: {
       type: Date,
