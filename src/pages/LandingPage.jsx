@@ -66,7 +66,7 @@ export default function LandingPage() {
   };
 
   return (
-    <main className="section" style={{ gap: 64 }}>
+    <main className="section" style={{ gap: 48, paddingBottom: 64 }}>
       {/* Crypto not available warning */}
       {!cryptoOk && (
         <div style={{
@@ -74,195 +74,174 @@ export default function LandingPage() {
           padding: '12px 18px',
           background: 'rgba(255,69,58,0.1)', border: '1px solid rgba(255,69,58,0.3)',
           borderRadius: 'var(--radius-md)', color: '#ff453a', fontSize: 14,
-          maxWidth: 600, width: '100%',
+          maxWidth: 600, width: '100%', marginBottom: -16
         }}>
           <AlertTriangle size={16} />
           Your browser does not support Web Crypto API. Please upgrade to a modern browser.
         </div>
       )}
 
-      {/* Hero */}
-      <div className="text-center animate-fadeUp" style={{ maxWidth: 640 }}>
-        <div className="hero-eyebrow">
-          <Shield size={12} />
-          Anonymous &amp; Encrypted Clipboard
+      {/* Landing Container: Hero + Form */}
+      <div className="landing-hero-container animate-fadeUp">
+        {/* Hero Content */}
+        <div className="hero-content">
+          <div className="hero-eyebrow">
+            <Shield size={12} />
+            Anonymous &amp; Encrypted Clipboard
+          </div>
+          <h1 className="hero-title">
+            Share clips with<br /><span>zero trace</span>
+          </h1>
+          <p className="hero-subtitle">
+            Paste any text, code, or data and share it across devices instantly.
+            No accounts. No logs. Everything encrypted with AES-256-GCM.
+          </p>
         </div>
-        <h1 className="hero-title">
-          Share clips with<br /><span>zero trace</span>
-        </h1>
-        <p className="hero-subtitle">
-          Paste any text, code, or data and share it across devices instantly.
-          No accounts. No logs. Everything encrypted with AES-256-GCM, client-side.
-        </p>
-      </div>
 
-      {/* Main Form Card */}
-      <div
-        className="card card-glow-accent animate-fadeUp w-full"
-        style={{ maxWidth: 600, padding: '36px 40px', animationDelay: '0.1s' }}
-      >
-        <form onSubmit={handleSend}>
-          {/* Retention settings header */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Clock size={16} color="var(--color-accent)" />
-              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                Retention Settings
-              </span>
-            </div>
-            <div style={{ display: 'flex', gap: 6 }}>
-              {RETENTION.map(r => (
-                <button
-                  key={r.value}
-                  type="button"
-                  onClick={() => setRetention(r.value)}
-                  className="btn btn-sm"
-                  style={{
-                    background: retention === r.value ? 'var(--color-accent)' : 'rgba(255,255,255,0.05)',
-                    color: retention === r.value ? '#fff' : 'var(--color-text-secondary)',
-                    border: `1px solid ${retention === r.value ? 'var(--color-accent)' : 'var(--color-border)'}`,
-                    padding: '4px 10px',
-                    fontSize: 12,
-                  }}
-                >
-                  {r.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Textarea */}
-          <div className="input-group" style={{ marginBottom: 16 }}>
-            <label className="input-label" htmlFor="clip-content" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span>Clipboard Content</span>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <button 
-                  type="button" 
-                  onClick={async () => {
-                    try {
-                      const text = await navigator.clipboard.readText();
-                      setContent(text);
-                    } catch (err) {
-                      alert('Please paste using Ctrl+V (or Cmd+V on Mac)');
-                    }
-                  }}
-                  className="btn btn-ghost btn-sm"
-                  style={{ padding: '2px 8px', fontSize: 11, background: 'rgba(255,255,255,0.05)' }}
-                >
-                  Paste
-                </button>
-                <button 
-                  type="button" 
-                  onClick={() => setContent('')}
-                  className="btn btn-ghost btn-sm"
-                  style={{ padding: '2px 8px', fontSize: 11, background: 'rgba(255,255,255,0.05)' }}
-                >
-                  Clear
-                </button>
-              </div>
-            </label>
-            <textarea
-              id="clip-content"
-              className="input-field textarea-field mono"
-              placeholder="Paste your text, code, or data here..."
-              value={content}
-              onChange={e => setContent(e.target.value)}
-              rows={8}
-              required
-              autoFocus
-            />
-            {/* Byte counter */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
-              <span className="text-muted" style={{ fontSize: 12, color: isOverLimit ? '#ff453a' : undefined }}>
-                {byteSize >= 1024
-                  ? `${(byteSize / 1024).toFixed(1)} KB`
-                  : `${byteSize} B`} / 100 KB
-                {isOverLimit && ' — content too large'}
-              </span>
-            </div>
-          </div>
-
-          {/* Burn on read toggle */}
-          <div style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '12px 14px',
-            background: burnOnRead ? 'rgba(255,69,58,0.06)' : 'rgba(255,255,255,0.03)',
-            border: `1px solid ${burnOnRead ? 'rgba(255,69,58,0.25)' : 'var(--color-border)'}`,
-            borderRadius: 'var(--radius-md)',
-            marginBottom: 20,
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-          }}
-            onClick={() => setBurnOnRead(b => !b)}
+        {/* Main Form Card */}
+        <div className="hero-card-wrap">
+          <div
+            className="card card-glow-accent w-full"
+            style={{ maxWidth: 520, padding: '32px 32px' }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <Flame size={16} color={burnOnRead ? '#ff453a' : 'var(--color-text-muted)'} />
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: burnOnRead ? '#ff453a' : 'var(--color-text-primary)' }}>
-                  Burn on Read
+            <form onSubmit={handleSend}>
+              {/* Retention settings header */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Clock size={16} color="var(--color-accent)" />
+                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                    Retention
+                  </span>
                 </div>
-                <div style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>
-                  Clip self-destructs after the first retrieval
+                <div style={{ display: 'flex', gap: 6 }}>
+                  {RETENTION.map(r => (
+                    <button
+                      key={r.value}
+                      type="button"
+                      onClick={() => setRetention(r.value)}
+                      className="btn btn-sm"
+                      style={{
+                        background: retention === r.value ? 'var(--color-accent)' : 'rgba(255,255,255,0.05)',
+                        color: retention === r.value ? '#fff' : 'var(--color-text-secondary)',
+                        border: `1px solid ${retention === r.value ? 'var(--color-accent)' : 'var(--color-border)'}`,
+                        padding: '4px 10px',
+                        fontSize: 11,
+                      }}
+                    >
+                      {r.label}
+                    </button>
+                  ))}
                 </div>
               </div>
-            </div>
-            {/* Toggle switch */}
-            <div style={{
-              width: 40, height: 22,
-              background: burnOnRead ? '#ff453a' : 'rgba(255,255,255,0.12)',
-              borderRadius: 11,
-              position: 'relative',
-              transition: 'background 0.2s',
-              flexShrink: 0,
-            }}>
+
+              {/* Textarea */}
+              <div className="input-group" style={{ marginBottom: 14 }}>
+                <textarea
+                  id="clip-content"
+                  className="input-field textarea-field mono"
+                  placeholder="Paste your text, code, or data here..."
+                  value={content}
+                  onChange={e => setContent(e.target.value)}
+                  rows={6}
+                  required
+                  autoFocus
+                  style={{ minHeight: 140 }}
+                />
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, alignItems: 'center' }}>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button 
+                      type="button" 
+                      onClick={async () => {
+                        try {
+                          const text = await navigator.clipboard.readText();
+                          setContent(text);
+                        } catch (err) {
+                          alert('Please paste using Ctrl+V');
+                        }
+                      }}
+                      className="btn btn-ghost btn-sm"
+                      style={{ padding: '2px 8px', fontSize: 11, background: 'rgba(255,255,255,0.05)' }}
+                    >
+                      Paste
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => setContent('')}
+                      className="btn btn-ghost btn-sm"
+                      style={{ padding: '2px 8px', fontSize: 11, background: 'rgba(255,255,255,0.05)' }}
+                    >
+                      Clear
+                    </button>
+                  </div>
+                  <span className="text-muted" style={{ fontSize: 11, color: isOverLimit ? '#ff453a' : undefined }}>
+                    {byteSize >= 1024
+                      ? `${(byteSize / 1024).toFixed(1)} KB`
+                      : `${byteSize} B`} / 100 KB
+                  </span>
+                </div>
+              </div>
+
+              {/* Burn on read toggle */}
               <div style={{
-                position: 'absolute',
-                top: 3, left: burnOnRead ? 20 : 3,
-                width: 16, height: 16,
-                borderRadius: '50%',
-                background: '#fff',
-                transition: 'left 0.2s',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
-              }} />
-            </div>
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '10px 12px',
+                background: burnOnRead ? 'rgba(255,69,58,0.06)' : 'rgba(255,255,255,0.03)',
+                border: `1px solid ${burnOnRead ? 'rgba(255,69,58,0.25)' : 'var(--color-border)'}`,
+                borderRadius: 'var(--radius-md)',
+                marginBottom: 16,
+                cursor: 'pointer',
+              }}
+                onClick={() => setBurnOnRead(b => !b)}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <Flame size={14} color={burnOnRead ? '#ff453a' : 'var(--color-text-muted)'} />
+                  <span style={{ fontSize: 13, fontWeight: 500, color: burnOnRead ? '#ff453a' : 'var(--color-text-primary)' }}>
+                    Burn on Read
+                  </span>
+                </div>
+                {/* Toggle switch */}
+                <div style={{
+                  width: 32, height: 18,
+                  background: burnOnRead ? '#ff453a' : 'rgba(255,255,255,0.12)',
+                  borderRadius: 9,
+                  position: 'relative',
+                  transition: 'background 0.2s',
+                }}>
+                  <div style={{
+                    position: 'absolute',
+                    top: 2, left: burnOnRead ? 16 : 2,
+                    width: 14, height: 14,
+                    borderRadius: '50%',
+                    background: '#fff',
+                    transition: 'left 0.2s',
+                  }} />
+                </div>
+              </div>
+
+              {/* CTA */}
+              <button
+                type="submit"
+                className="btn btn-primary btn-lg btn-full"
+                disabled={!content.trim() || loading || isOverLimit || !cryptoOk}
+                id="send-clip-btn"
+                style={{ height: 52 }}
+              >
+                {loading ? (
+                  <>
+                    <RefreshCw size={16} style={{ animation: 'spin 1s linear infinite' }} />
+                    Encrypting...
+                  </>
+                ) : (
+                  <>
+                    <ClipboardCopy size={16} />
+                    Send to Clipboard
+                    <ChevronRight size={16} />
+                  </>
+                )}
+              </button>
+            </form>
           </div>
-
-          {/* API Error */}
-          {error && (
-            <div style={{
-              padding: '12px 16px',
-              background: 'rgba(255,69,58,0.08)',
-              border: '1px solid rgba(255,69,58,0.25)',
-              borderRadius: 'var(--radius-md)',
-              color: '#ff453a', fontSize: 14, marginBottom: 16,
-              display: 'flex', alignItems: 'center', gap: 8,
-            }}>
-              <AlertTriangle size={14} />
-              {error}
-            </div>
-          )}
-
-          {/* CTA */}
-          <button
-            type="submit"
-            className="btn btn-primary btn-lg btn-full"
-            disabled={!content.trim() || loading || isOverLimit || !cryptoOk}
-            id="send-clip-btn"
-          >
-            {loading ? (
-              <>
-                <RefreshCw size={16} style={{ animation: 'spin 1s linear infinite' }} />
-                Encrypting &amp; Sending...
-              </>
-            ) : (
-              <>
-                <ClipboardCopy size={16} />
-                Send to Clipboard
-                <ChevronRight size={16} />
-              </>
-            )}
-          </button>
-        </form>
+        </div>
       </div>
 
       {/* Feature grid */}
