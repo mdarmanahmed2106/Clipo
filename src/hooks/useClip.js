@@ -91,7 +91,7 @@ export function useRetrieveClip() {
     try {
       // Parse "CODE:KEY" or just "CODE" (fallback: key must be in hash)
       let code, keyB64;
-      
+
       // Handle cases where the input might contain the # fragment or a full URL
       let cleanInput = codeOrHash.trim();
       if (cleanInput.includes('#')) {
@@ -181,7 +181,7 @@ export function useDestroyClip() {
       const token = entry?.deleteToken;
 
       await destroyClip(code, token);
-      
+
       // Remove from local history
       const updated = history.filter(h => h.code !== code);
       localStorage.setItem(HISTORY_KEY, JSON.stringify(updated));

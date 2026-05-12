@@ -16,12 +16,12 @@ export default function App() {
       <Navbar />
 
       <Routes>
-        <Route path="/"          element={<LandingPage />} />
-        <Route path="/sent"      element={<SentSuccessPage />} />
-        <Route path="/retrieve"  element={<RetrievePage />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/sent" element={<SentSuccessPage />} />
+        <Route path="/retrieve" element={<RetrievePage />} />
         <Route path="/retrieved" element={<ContentRetrievedPage />} />
-        <Route path="/history"   element={<HistoryPage />} />
-        <Route path="*"          element={<Navigate to="/" replace />} />
+        <Route path="/history" element={<HistoryPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
       <Footer />
