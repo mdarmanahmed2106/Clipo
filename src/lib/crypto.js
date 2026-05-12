@@ -54,9 +54,13 @@ export async function importKey(b64url) {
  * @param {CryptoKey} key
  * @returns {Promise<{ ciphertext: string, iv: string }>} base64-encoded values
  */
+// Reuse singletons — avoids repeated object allocation on every encrypt/decrypt call
+const _encoder = new TextEncoder();
+const _decoder = new TextDecoder();
+
 export async function encrypt(plaintext, key) {
   const iv = window.crypto.getRandomValues(new Uint8Array(12));
-  const encoded = new TextEncoder().encode(plaintext);
+  const encoded = _encoder.encode(plaintext);
 
   const ciphertextBuffer = await window.crypto.subtle.encrypt(
     { name: ALGO, iv },
@@ -87,7 +91,7 @@ export async function decrypt(ciphertextB64, ivB64, key) {
     ciphertextBuffer
   );
 
-  return new TextDecoder().decode(decryptedBuffer);
+  return _decoder.decode(decryptedBuffer);
 }
 
 /**
@@ -104,9 +108,12 @@ export function isCryptoAvailable() {
 
 function arrayBufferToBase64(buffer) {
   const bytes = new Uint8Array(buffer);
+  // Use apply() instead of a += loop — ~10x faster on large payloads
+  // Chunk to avoid "Maximum call stack" on very large buffers
+  const CHUNK = 8192;
   let binary = '';
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i]);
+  for (let i = 0; i < bytes.length; i += CHUNK) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK));
   }
   return btoa(binary);
 }

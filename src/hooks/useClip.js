@@ -174,16 +174,17 @@ export function useDestroyClip() {
   const destroy = useCallback(async (code) => {
     setLoading(true);
     setError(null);
+    const upperCode = code.toUpperCase().trim();
     try {
-      // Find token in history if not provided (though code only for now)
+      // Find token in history — use case-insensitive compare to match server behaviour
       const history = loadHistory();
-      const entry = history.find(h => h.code === code);
+      const entry = history.find(h => h.code?.toUpperCase() === upperCode);
       const token = entry?.deleteToken;
 
-      await destroyClip(code, token);
+      await destroyClip(upperCode, token);
 
       // Remove from local history
-      const updated = history.filter(h => h.code !== code);
+      const updated = history.filter(h => h.code?.toUpperCase() !== upperCode);
       localStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
     } catch (err) {
       setError(err.message);
