@@ -441,8 +441,8 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 32px 24px;
+  justify-content: flex-start;
+  padding: 40px 24px 80px;
 }
 
 /* Landing Layout */

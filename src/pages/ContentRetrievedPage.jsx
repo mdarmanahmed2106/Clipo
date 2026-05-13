@@ -136,7 +136,7 @@ export default function ContentRetrievedPage() {
   }
 
   return (
-    <main className="section animate-fadeIn" style={{ gap: 0, padding: '40px 24px' }}>
+    <main className="section animate-fadeIn" style={{ gap: 0, padding: '24px 24px' }}>
       <div style={{ maxWidth: 680, width: '100%' }}>
         {/* Header */}
         <div className="animate-fadeUp" style={{ marginBottom: 28 }}>
