@@ -1,51 +1,73 @@
 # Clipo — Private & Secure Clipboard Sharing
 
-Clipo is an anonymous, zero-knowledge clipboard for sharing text and code snippets across devices securely.
+Clipo is an anonymous, zero-knowledge clipboard for sharing text and code snippets across devices securely. It uses client-side encryption to ensure that your data is never readable by the server.
 
-## 🚀 Deployment Checklist
+## ✨ Key Features
 
-Before deploying to production, ensure the following are configured on your hosting platform (Render, Railway, Netlify, Vercel, etc.):
+- **🔒 Zero-Knowledge Security**: Your data is encrypted in your browser before it ever reaches the server.
+- **🔑 Client-Side Encryption**: Uses AES-256-GCM (Web Crypto API). The decryption key is stored in the URL fragment (`#KEY`), which is never sent to the server.
+- **⏱️ Auto-Expiry**: Clips are automatically deleted after they are retrieved or after a set period.
+- **📱 Cross-Platform**: Share content seamlessly between your laptop, phone, and tablet.
+- **⚡ Fast & Minimal**: No accounts, no tracking, just secure sharing.
+- **🗑️ Secure Deletion**: Unique `deleteToken` for manual deletion via the API.
 
-### 1. Server Environment Variables
-Set these on your backend host:
-- `MONGO_URI`: Your production MongoDB Atlas connection string.
-- `PORT`: Usually set automatically by the host, or default to `5000`.
-- `ALLOWED_ORIGIN`: Set this to your **frontend** URL (e.g., `https://clipo.app`).
-- `NODE_ENV`: Set to `production`. This prevents internal stack traces from leaking to users.
+## 🛡️ Security Architecture
 
-### 2. Frontend Environment Variables
-Set these in your CI/CD settings:
-- `VITE_API_URL`: Set this to your **backend** API URL (e.g., `https://api.clipo.app/api`).
+Clipo follows a strict privacy-first architecture:
+1. **Encryption**: When you create a clip, a random AES-256 key is generated in your browser.
+2. **Storage**: The encrypted ciphertext is sent to the backend, but the **key stays in your browser**.
+3. **Retrieval**: The decryption key is appended to the URL as a hash fragment (e.g., `clipo.app/v/ID#KEY`). Browsers do not include the hash fragment in HTTP requests, so the server never sees the key.
+4. **Decryption**: Only the recipient with the full link can decrypt the content locally.
 
-### 3. Deletion Security
-The system now generates a unique `deleteToken` for every clip. Manual deletion via the API requires this token in the `X-Delete-Token` header.
+## 🛠️ Tech Stack
 
-### 4. SPA Fallback
-The project includes `public/_redirects` and `vercel.json` to ensure direct-linking to sub-pages works correctly on Netlify and Vercel.
+- **Frontend**: React, Vite, Tailwind CSS (Vanilla CSS with Tailwind-like utilities), Lucide React.
+- **Backend**: Node.js, Express, MongoDB.
+- **Security**: Native Web Crypto API (AES-GCM).
+- **Deployment**: Vercel (Frontend), Render/Railway (Backend).
 
-## 🛠️ Local Development
+## 🚀 Local Development
 
-1. `npm install` in both root and `server` directories.
-2. Create `.env` files based on `.env.example`.
-3. `npm run dev:all` to start both frontend and backend.
+1. **Clone the repo**:
+   ```bash
+   git clone https://github.com/mdarmanahmed2106/Clipo.git
+   cd Clipo
+   ```
+
+2. **Install Dependencies**:
+   ```bash
+   # Root (Frontend)
+   npm install
+   # Server (Backend)
+   cd server && npm install && cd ..
+   ```
+
+3. **Configure Environment**:
+   - Create a `.env` file in the `server` directory based on `.env.example`.
+   - Create a `.env` file in the root directory for Vite variables.
+
+4. **Run Locally**:
+   ```bash
+   npm run dev:all
+   ```
 
 ## 🚀 Deployment Guide
 
-### 1. Backend (Render)
-1. Create a new **Web Service** on [Render](https://render.com).
-2. Connect this GitHub repository.
-3. Set **Root Directory** to `server`.
-4. Set **Build Command** to `npm install`.
-5. Set **Start Command** to `node index.js`.
-6. Add the following **Environment Variables**:
+### 1. Backend (Render/Railway)
+1. Set **Root Directory** to `server`.
+2. **Build Command**: `npm install`.
+3. **Start Command**: `node index.js`.
+4. **Environment Variables**:
    - `MONGO_URI`: Your MongoDB Atlas connection string.
-   - `ALLOWED_ORIGIN`: Your Vercel frontend URL (e.g., `https://clipo-app.vercel.app`).
+   - `ALLOWED_ORIGIN`: Your frontend URL.
    - `NODE_ENV`: `production`.
 
 ### 2. Frontend (Vercel)
-1. Create a new project on [Vercel](https://vercel.com).
-2. Connect this GitHub repository.
-3. Vercel will automatically detect the Vite setup.
-4. Add the following **Environment Variable**:
-   - `VITE_API_URL`: Your Render backend URL (e.g., `https://clipo-api.onrender.com/api`).
-5. Click **Deploy**.
+1. Connect the repository.
+2. Vercel will automatically detect the Vite setup.
+3. **Environment Variable**:
+   - `VITE_API_URL`: Your backend API URL.
+
+## 📜 License
+
+MIT License. See [LICENSE](LICENSE) for details.
