@@ -927,11 +927,11 @@ body {
 
   .navbar-nav {
     display: none;
-    position: fixed;
+    position: absolute;
     top: 72px;
     left: 0;
     right: 0;
-    bottom: 0;
+    height: calc(100vh - 72px);
     background: var(--color-bg);
     flex-direction: column;
     padding: 24px;
@@ -941,7 +941,7 @@ body {
 
   .navbar-nav.open {
     display: flex;
-    animation: fadeIn 0.2s ease forwards;
+    animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
   .navbar-nav a {
